@@ -64,8 +64,13 @@ export default function LoginScreen() {
 
       // Handle successful login
       if (data.token) {
-        await login(data.token, data.user);
-        router.replace('/checkin');
+        const userData = {
+          id: data.user?.id,
+          email: data.user?.email,
+          role: data.user?.role
+        };
+        await login(data.token, userData);
+        router.replace('/validate');
       } else {
         throw new Error('No token received');
       }
