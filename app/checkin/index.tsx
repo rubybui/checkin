@@ -16,7 +16,7 @@ import { useEffect, useRef, useState } from "react";
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 
-export default function ScannerScreen() {
+export default function CheckinScreen() {
   const qrLock = useRef(false);
   const appState = useRef(AppState.currentState);
   const checkedIn = 23;
@@ -224,4 +224,4 @@ const styles = StyleSheet.create({
   logoutButton: {
     padding: 8,
   },
-});
+}); 
