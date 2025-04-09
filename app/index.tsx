@@ -15,6 +15,7 @@ import { encrypt } from './utils/encryption';
 import { config } from './config';
 import { useAuth } from './context/AuthContext';
 import { useRouter } from 'expo-router';
+import { theme } from './theme';
 
 export default function LoginScreen() {
   const { login } = useAuth();
@@ -144,7 +145,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#7BC67E',
+    backgroundColor: theme.colors.primary,
   },
   content: {
     flex: 1,
@@ -192,7 +193,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   loginButton: {
-    backgroundColor: '#7BC67E',
+    backgroundColor: theme.colors.primary,
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
