@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { config } from './config';
@@ -6,14 +6,14 @@ import { useAuth } from './context/AuthContext';
 
 export default function TicketDetailsScreen() {
   const { ticket, checkinRecord } = useLocalSearchParams();
-  const ticketData = JSON.parse(ticket as string);
-  const checkinData = checkinRecord ? JSON.parse(checkinRecord as string) : null;
+  const ticketData = ticket ? JSON.parse(decodeURIComponent(ticket as string)) : null;
+  const checkinData = checkinRecord ? JSON.parse(decodeURIComponent(checkinRecord as string)) : null;
 
+  console.log('Ticket data:', ticketData);
   const router = useRouter();
   const { user } = useAuth();
 
   const alreadyCheckedIn = !!checkinData;
-  console.log('checkinData', checkinData);
 
   const handleCheckIn = async () => {
     try {
@@ -30,118 +30,132 @@ export default function TicketDetailsScreen() {
         throw new Error(error.message || 'Failed to check in');
       }
 
-      const data = await response.json();
-      Alert.alert('Success', 'Ticket checked in successfully');
-      router.replace({
-        pathname: '/ticket-details',
-        params: {
-          ticket: JSON.stringify(data.ticket),
-          checkinRecord: JSON.stringify(data.checkinRecord || { checkedInAt: new Date().toISOString() }),
-        },
-      });
+      Alert.alert(
+        'Success',
+        'Ticket checked in successfully',
+        [
+          {
+            text: 'OK',
+            onPress: () => router.push('/validate')
+          }
+        ]
+      );
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Failed to check in');
     }
   };
 
+  if (!ticketData) {
+    return (
+      <ScrollView style={styles.container}>
+        <View style={styles.content}>
+          <Text style={styles.errorText}>Invalid ticket data</Text>
+        </View>
+      </ScrollView>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <View style={[styles.card, alreadyCheckedIn ? styles.cardUsed : styles.cardValid]}>
-      <Text style={styles.ticketCode}>TICKET #{ticketData.code}</Text>
+    <ScrollView style={styles.container}>
+      <View style={styles.content}>
+        <View style={[styles.card, alreadyCheckedIn ? styles.cardUsed : styles.cardValid]}>
+          <Text style={styles.ticketCode}>TICKET #{ticketData.ticketCode}</Text>
 
-<View style={styles.successIcon}>
-  <Ionicons
-    name={alreadyCheckedIn ? 'close-circle' : 'checkmark-circle'}
-    size={80}
-    color="#fff"
-  />
-</View>
+          <View style={styles.successIcon}>
+            <Ionicons
+              name={alreadyCheckedIn ? 'close-circle' : 'checkmark-circle'}
+              size={80}
+              color="#fff"
+            />
+          </View>
 
-<Text style={styles.successText}>
-  {alreadyCheckedIn ? 'ALREADY CHECKED IN' : 'VALID TICKET'}
-</Text>
+          <Text style={styles.successText}>
+            {alreadyCheckedIn ? 'ALREADY CHECKED IN' : 'VALID TICKET'}
+          </Text>
 
-{alreadyCheckedIn && (
-  <View style={styles.checkinBox}>
-    <Text style={styles.checkinLabel}>Checked in at:</Text>
-    <Text style={styles.checkinValue}>
-      {new Date(checkinData.checkInTime).toLocaleString()}
-    </Text>
-    <Text style={styles.checkinLabel}>Checked in by:</Text>
-    <Text style={styles.checkinValue}>
-      {checkinData.checkedInBy.email} {/* Hiển thị email của người check-in */}
-    </Text>
-  </View>
-)}
+          {alreadyCheckedIn && checkinData && (
+            <View style={styles.checkinBox}>
+              <Text style={styles.checkinLabel}>Checked in at:</Text>
+              <Text style={styles.checkinValue}>
+                {new Date(checkinData.checkedInAt).toLocaleString()}
+              </Text>
+              {checkinData.checkedInBy && (
+                <>
+                  <Text style={styles.checkinLabel}>Checked in by:</Text>
+                  <Text style={styles.checkinValue}>
+                    {checkinData.checkedInBy.email || 'N/A'}
+                  </Text>
+                </>
+              )}
+            </View>
+          )}
 
-<View style={styles.divider} />
-<Text style={styles.sectionTitle}>TICKET INFORMATION</Text>
+          <View style={styles.divider} />
+          <Text style={styles.sectionTitle}>TICKET INFORMATION</Text>
 
-<View style={styles.infoContainer}>
-  <View style={styles.infoRow}>
-    <Text style={styles.label}>NAME:</Text>
-    <Text style={styles.value}>{ticketData.attendeeName || 'N/A'}</Text>
-  </View>
+          <View style={styles.infoContainer}>
+            <View style={styles.infoRow}>
+              <Text style={styles.label}>NAME:</Text>
+              <Text style={styles.value}>{ticketData.attendeeName || 'N/A'}</Text>
+            </View>
 
-  <View style={styles.infoRow}>
-    <Text style={styles.label}>COUNT:</Text>
-    <Text style={styles.value}>{ticketData.quantity || 1}</Text>
-  </View>
+            <View style={styles.infoRow}>
+              <Text style={styles.label}>COUNT:</Text>
+              <Text style={styles.value}>{ticketData.quantity || 1}</Text>
+            </View>
 
-  <View style={styles.infoRow}>
-    <Text style={styles.label}>ORDER ID:</Text>
-    <View style={styles.orderIdContainer}>
-      <Text style={styles.orderIdText}>{ticketData.orderId || ticketData.code}</Text>
-    </View>
-  </View>
+            <View style={styles.infoRow}>
+              <Text style={styles.label}>ORDER ID:</Text>
+              <View style={styles.orderIdContainer}>
+                <Text style={styles.orderIdText}>{ticketData.orderId}</Text>
+              </View>
+            </View>
 
-  <View style={styles.infoRow}>
-    <Text style={styles.label}>EVENT NAME:</Text>
-    <Text style={styles.value}>{ticketData.eventName || 'Event'}</Text>
-  </View>
+            <View style={styles.infoRow}>
+              <Text style={styles.label}>EVENT NAME:</Text>
+              <Text style={styles.value}>{ticketData.eventName || 'Event'}</Text>
+            </View>
 
-  <View style={styles.infoRow}>
-    <Text style={styles.label}>EVENT TIME:</Text>
-    <Text style={styles.value}>{ticketData.eventTime || new Date().toLocaleString()}</Text>
-  </View>
+            <View style={styles.infoRow}>
+              <Text style={styles.label}>EVENT TIME:</Text>
+              <Text style={styles.value}>{ticketData.eventTime}</Text>
+            </View>
 
-  <View style={styles.infoRow}>
-    <Text style={styles.label}>STATUS:</Text>
-    <Text style={[styles.value, alreadyCheckedIn ? styles.statusUsed : styles.statusValid]}>
-      {alreadyCheckedIn ? 'Used' : 'Valid'}
-    </Text>
-  </View>
+            <View style={styles.infoRow}>
+              <Text style={styles.label}>STATUS:</Text>
+              <Text style={[styles.value, alreadyCheckedIn ? styles.statusUsed : styles.statusValid]}>
+                {alreadyCheckedIn ? 'Used' : 'Valid'}
+              </Text>
+            </View>
+          </View>
 
-  {alreadyCheckedIn && (
-    <View style={styles.infoRow}>
-      <Text style={styles.label}>CHECKED IN AT:</Text>
-      <Text style={styles.value}>
-        {new Date(checkinData.checkedInAt).toLocaleString()}
-      </Text>
-    </View>
-  )}
-</View>
-
-<TouchableOpacity
-  style={[styles.button, alreadyCheckedIn && styles.buttonDisabled]}
-  onPress={handleCheckIn}
-  disabled={alreadyCheckedIn}
->
-  <Text style={[styles.buttonText, alreadyCheckedIn && styles.buttonTextDisabled]}>
-    {alreadyCheckedIn ? 'TICKET ALREADY USED' : 'CHECK IN TICKET'}
-  </Text>
-</TouchableOpacity>
-
+          <TouchableOpacity
+            style={[styles.button, alreadyCheckedIn && styles.buttonDisabled]}
+            onPress={handleCheckIn}
+            disabled={alreadyCheckedIn}
+          >
+            <Text style={[styles.buttonText, alreadyCheckedIn && styles.buttonTextDisabled]}>
+              {alreadyCheckedIn ? 'TICKET ALREADY USED' : 'CHECK IN TICKET'}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#f5f5f5',
+  },
+  content: {
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#FF5C5C',
+    textAlign: 'center',
   },
   card: {
     borderRadius: 20,
@@ -266,5 +280,6 @@ const styles = StyleSheet.create({
   checkinValue: {
     fontSize: 14,
     color: '#555',
-  },  
+    marginBottom: 8,
+  },
 });
