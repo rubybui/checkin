@@ -131,6 +131,15 @@ export default function ValidateScreen() {
           {isLoading ? 'Validating...' : 'Validate Ticket'}
         </Text>
       </TouchableOpacity>
+      <View style={{ alignItems: 'flex-end', marginBottom: 10 }}>
+  <TouchableOpacity onPress={() => router.push('/history')}>
+    <View style={styles.historyButton}>
+      <Ionicons name="time-outline" size={16} color="#007AFF" style={{ marginRight: 4 }} />
+      <Text style={styles.historyText}>View History</Text>
+    </View>
+  </TouchableOpacity>
+</View>
+
 
       {multipleTickets.length > 0 && (
         <View style={styles.multipleTicketsContainer}>
@@ -187,6 +196,20 @@ export default function ValidateScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: '#fff' },
+  historyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#007AFF',
+  },
+  historyText: {
+    color: '#007AFF',
+    fontWeight: '500',
+    fontSize: 14,
+  },  
   input: {
     height: 50,
     borderWidth: 1,
