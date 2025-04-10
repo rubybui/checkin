@@ -33,6 +33,7 @@ export default function ValidateScreen() {
         },
       });
       const data = await response.json();
+
       if (response.status === 300 && data.tickets) {
         setMultipleTickets(data.tickets);
         return;
@@ -44,7 +45,6 @@ export default function ValidateScreen() {
           eventName: data.ticket.eventTitle,
           eventTime: data.ticket.scheduleDate.split(' ')[0],
           seat: data.ticket.seat,
-          orderId: data.ticket.ticketCode,
         }));
         const encodedCheckinRecord = encodeURIComponent(JSON.stringify(data.checkinRecord));
         router.push({ pathname: '/ticket-details', params: { ticket: encodedTicket, checkinRecord: encodedCheckinRecord } });
@@ -60,7 +60,6 @@ export default function ValidateScreen() {
         eventName: data.ticket.eventTitle,
         eventTime: data.ticket.scheduleDate.split(' ')[0],
         seat: data.ticket.seat,
-        orderId: data.ticket.ticketCode,
       }));
       router.push({ pathname: '/ticket-details', params: { ticket: encodedTicket } });
     } catch (error: any) {
@@ -78,7 +77,6 @@ export default function ValidateScreen() {
       eventLocation: ticket.eventLocation,
       eventTime: ticket.scheduleDate ? ticket.scheduleDate.split(' ')[0] : 'Invalid date',
       seat: ticket.seat,
-      orderId: ticket.ticketCode,
     }));
     const params: any = { ticket: encodedTicket };
     if (ticket.isCheckedIn && ticket.checkinRecord) {
@@ -139,7 +137,7 @@ export default function ValidateScreen() {
                   <Text style={styles.ticketInfo}><Text style={styles.label}>Schedule: </Text>{ticket.scheduleDate.split(' ')[0]}</Text>
                   <Text style={styles.ticketInfo}><Text style={styles.label}>Seat: </Text>{ticket.seat || 'N/A'}</Text>
                   {ticket.isCheckedIn && ticket.checkinRecord && (
-                    <Text style={styles.ticketInfo}><Text style={styles.label}>Checked in: </Text>{new Date(ticket.checkinRecord.checkedInAt).toLocaleString()}</Text>
+                    <Text style={styles.ticketInfo}><Text style={styles.label}>Checked in: </Text>{ticket.checkinRecord.checkInTime.split('T')[0]}</Text>
                   )}
                 </View>
               </TouchableOpacity>
