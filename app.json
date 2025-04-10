@@ -1,5 +1,6 @@
 {
   "expo": {
+    "newArchEnabled": true,
     "name": "ExpoQR2",
     "slug": "ExpoQR2",
     "version": "1.0.0",
