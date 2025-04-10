@@ -21,6 +21,7 @@ const HistoryScreen = () => {
 
       const data = await response.json();
       setCheckins(data.records || []);
+      console.log(data.records);
     } catch (err) {
       console.error('Failed to load history', err);
     } finally {
@@ -67,8 +68,9 @@ const HistoryScreen = () => {
                 <View style={styles.itemInfo}>
                   <Text style={styles.itemTitle}>{item.ticketCode} — {item.attendeeName}</Text>
                   <Text style={styles.itemUrl}>{item.eventTitle}</Text>
-                  <Text style={styles.itemUrl}>Seat: {item.seat || 'N/A'}</Text>
-                  <Text style={styles.itemUrl}>Checked in: {new Date(item.scheduleDate).toLocaleString()}</Text>
+                  <Text style={styles.itemUrl}>Seat: {item.ticket.seat || 'N/A'}</Text>
+                  <Text style={styles.itemUrl}>Checked in: {item.checkInTime.split('T')[0]}</Text>
+                  <Text style={styles.itemUrl}>Checked in by: {item.checkedInBy.email}</Text>
                 </View>
               </View>
             </View>

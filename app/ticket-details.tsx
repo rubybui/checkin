@@ -10,6 +10,7 @@ const screenWidth = Dimensions.get('window').width;
 
 export default function TicketDetailsScreen() {
   const { ticket, checkinRecord } = useLocalSearchParams();
+  
   const ticketData = ticket ? JSON.parse(decodeURIComponent(ticket as string)) : null;
   const checkinData = checkinRecord ? JSON.parse(decodeURIComponent(checkinRecord as string)) : null;
   const alreadyCheckedIn = !!checkinData;
@@ -78,7 +79,7 @@ export default function TicketDetailsScreen() {
           <View style={styles.detailRow}><Text style={styles.detailLabel}>Event:</Text><Text style={styles.detailValue}>{ticketData.eventName}</Text></View>
           <View style={styles.detailRow}><Text style={styles.detailLabel}>Date:</Text><Text style={styles.detailValue}>{ticketData.eventTime}</Text></View>
           <View style={styles.detailRow}><Text style={styles.detailLabel}>Seat:</Text><Text style={styles.detailValue}>{ticketData.seat}</Text></View>
-          <View style={styles.detailRow}><Text style={styles.detailLabel}>Order ID:</Text><Text style={styles.detailValue}>{ticketData.orderId}</Text></View>
+
         </View>
 
         <TouchableOpacity
