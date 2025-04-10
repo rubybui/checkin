@@ -21,7 +21,6 @@ const HistoryScreen = () => {
 
       const data = await response.json();
       setCheckins(data.records || []);
-      console.log(data.records);
     } catch (err) {
       console.error('Failed to load history', err);
     } finally {
