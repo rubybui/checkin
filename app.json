@@ -1,5 +1,6 @@
 {
   "expo": {
+    "developmentClient": {},
     "newArchEnabled": true,
     "name": "ExpoQR2",
     "slug": "ExpoQR2",
@@ -35,6 +36,7 @@
     },
     "plugins": [
       "expo-router",
+      "expo-updates",
       [
         "expo-camera",
         {
@@ -52,8 +54,12 @@
         "origin": false
       },
       "eas": {
-        "projectId": "1cb1cdfc-4a5d-4e5e-8543-d1654499c800"
+        "projectId": "90b1c9ed-2044-4ddd-9481-987dec3d0718"
       }
+    },
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/90b1c9ed-2044-4ddd-9481-987dec3d0718"
     }
   }
 }
