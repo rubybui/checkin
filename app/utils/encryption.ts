@@ -1,3 +1,5 @@
+import 'react-native-get-random-values';
+
 import { config } from '../config';
 import CryptoJS from 'crypto-js';
 const IV_LENGTH = 16; // AES block size
@@ -14,5 +16,6 @@ export function encrypt(text: string): string {
   });
   // Concatenate iv + ciphertext and base64 encode it
   const combined = iv.concat(encrypted.ciphertext);
+
   return combined.toString(CryptoJS.enc.Base64);
 }
