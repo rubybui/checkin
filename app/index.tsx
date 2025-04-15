@@ -8,7 +8,9 @@ import {
   SafeAreaView,
   Alert,
   ActivityIndicator,
-  Platform
+  Platform,
+  KeyboardAvoidingView,
+  ScrollView
 } from 'react-native';
 import { Stack } from 'expo-router';
 import { encrypt } from './utils/encryption';
@@ -31,11 +33,7 @@ export default function LoginScreen() {
     }
 
     try {
-      console.log('[ios] API Base URL:', config.apiBaseUrl);
       const endpoint = `${config.apiBaseUrl}/checkin-app/auth`;
-      console.log('[ios] Full endpoint:', endpoint);
-
-      // Encrypt credentials
       const encryptedEmail = await encrypt(email);
       const encryptedPassword = await encrypt(password);
 
@@ -43,8 +41,6 @@ export default function LoginScreen() {
         email: encryptedEmail,
         password: encryptedPassword
       };
-
-      console.log('[ios] Request Body:', JSON.stringify(requestBody));
 
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -61,9 +57,7 @@ export default function LoginScreen() {
       }
 
       const data = await response.json();
-      console.log('[ios] Login response:', data);
 
-      // Handle successful login
       if (data.token) {
         const userData = {
           id: data.user?.id,
@@ -76,7 +70,6 @@ export default function LoginScreen() {
         throw new Error('No token received');
       }
     } catch (error) {
-      console.error('[ios] Login error caught:', error);
       Alert.alert(
         'Login Failed',
         error instanceof Error ? error.message : 'An error occurred during login'
@@ -86,58 +79,65 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Stack.Screen
-        options={{
-          headerShown: false,
-        }}
-      />
+      <Stack.Screen options={{ headerShown: false }} />
 
-      <View style={styles.content}>
-        <Text style={styles.title}>Welcome Back</Text>
-        <Text style={styles.subtitle}>Sign in to continue</Text>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.content}>
+            <Text style={styles.title}>Welcome Back</Text>
+            <Text style={styles.subtitle}>Sign in to continue</Text>
 
-        <View style={styles.formContainer}>
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
-              value={email}
-              onChangeText={setEmail}
-              placeholder="Enter your email"
-              autoCapitalize="none"
-              keyboardType="email-address"
-              editable={!isLoading}
-              autoCorrect={false}
-            />
+            <View style={styles.formContainer}>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Email</Text>
+                <TextInput
+                  style={styles.input}
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="Enter your email"
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  editable={!isLoading}
+                  autoCorrect={false}
+                />
+              </View>
+
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Password</Text>
+                <TextInput
+                  style={styles.input}
+                  value={password}
+                  onChangeText={setPassword}
+                  placeholder="Enter your password"
+                  secureTextEntry
+                  editable={!isLoading}
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                />
+              </View>
+
+              <TouchableOpacity
+                style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
+                onPress={handleLogin}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.loginButtonText}>Sign In</Text>
+                )}
+              </TouchableOpacity>
+            </View>
           </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              style={styles.input}
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Enter your password"
-              secureTextEntry
-              editable={!isLoading}
-              autoCorrect={false}
-              autoCapitalize="none"
-            />
-          </View>
-
-          <TouchableOpacity
-            style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
-            onPress={handleLogin}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.loginButtonText}>Sign In</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-      </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -147,11 +147,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.primary,
   },
+  scrollContent: {
+    flexGrow: 1,
+  },
   content: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
+    paddingVertical: 48,
   },
   title: {
     fontSize: 32,
