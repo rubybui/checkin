@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, Alert, ScrollView } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useAuth } from './context/AuthContext';
 import { config } from './config';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +12,23 @@ export default function ValidateScreen() {
   const [multipleTickets, setMultipleTickets] = useState<any[]>([]);
   const router = useRouter();
   const { token } = useAuth();
+  const {
+    eventId: rawEventId,
+    scheduleId: rawScheduleId,
+    eventLocation: rawEventLocation,
+    eventTitle: rawEventTitle,
+    eventScheduleDate: rawScheduleDate,
+  } = useLocalSearchParams();
+
+  // Save as local state for reuse
+  const [eventId] = useState(rawEventId?.toString());
+  const [scheduleId] = useState(rawScheduleId?.toString());
+  const [eventLocation] = useState(rawEventLocation?.toString());
+  const [eventTitle] = useState(rawEventTitle?.toString());
+  const [scheduleDate] = useState(
+    rawScheduleDate?.toString().split('T')[0] || 'Invalid date'
+  );
+
 
   const handleCheckIn = async () => {
     if (!ticketCode.trim()) {
@@ -31,8 +48,12 @@ export default function ValidateScreen() {
           'Content-Type': 'application/json',
           Authorization: `JWT ${token}`,
         },
+        body: JSON.stringify({
+          eventId, eventScheduleId: scheduleId
+        }),
       });
       const data = await response.json();
+     
 
       if (response.status === 300 && data.tickets) {
         setMultipleTickets(data.tickets);
@@ -57,8 +78,8 @@ export default function ValidateScreen() {
       const encodedTicket = encodeURIComponent(JSON.stringify({
         code: data.ticket.ticketCode,
         attendeeName: data.ticket.attendeeName,
-        eventName: data.ticket.eventTitle,
-        eventTime: data.ticket.scheduleDate.split(' ')[0],
+        eventName: eventTitle,
+        eventTime: scheduleDate,
         seat: data.ticket.seat,
       }));
       router.push({ pathname: '/ticket-details', params: { ticket: encodedTicket } });
@@ -73,9 +94,9 @@ export default function ValidateScreen() {
     const encodedTicket = encodeURIComponent(JSON.stringify({
       code: ticket.ticketCode,
       attendeeName: ticket.attendeeName,
-      eventName: ticket.eventTitle,
-      eventLocation: ticket.eventLocation,
-      eventTime: ticket.scheduleDate ? ticket.scheduleDate.split(' ')[0] : 'Invalid date',
+      eventName: eventTitle,
+      eventLocation: eventLocation,
+      eventTime: scheduleDate,
       seat: ticket.seat,
     }));
     const params: any = { ticket: encodedTicket };
@@ -134,7 +155,7 @@ export default function ValidateScreen() {
                 </View>
                 <View style={styles.ticketDetails}>
                   <Text style={styles.ticketInfo}><Text style={styles.label}>Event: </Text>{ticket.eventTitle} — {ticket.eventLocation}</Text>
-                  <Text style={styles.ticketInfo}><Text style={styles.label}>Schedule: </Text>{ticket.scheduleDate.split(' ')[0]}</Text>
+                  <Text style={styles.ticketInfo}><Text style={styles.label}>Schedule: </Text>{scheduleDate}</Text>
                   <Text style={styles.ticketInfo}><Text style={styles.label}>Seat: </Text>{ticket.seat || 'N/A'}</Text>
                   {ticket.isCheckedIn && ticket.checkinRecord && (
                     <Text style={styles.ticketInfo}><Text style={styles.label}>Checked in: </Text>{ticket.checkinRecord.checkInTime.split('T')[0]}</Text>

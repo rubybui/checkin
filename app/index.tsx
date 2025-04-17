@@ -71,7 +71,7 @@ export default function LoginScreen() {
           role: data.user?.role
         };
         await login(data.token, userData);
-        router.replace('/validate');
+        router.replace('/events');
       } else {
         throw new Error('No token received');
       }
