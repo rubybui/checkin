@@ -3,7 +3,6 @@ import { View, StyleSheet, Alert, ScrollView, Image, Text, TouchableOpacity } fr
 import { useRouter } from 'expo-router';
 import { useAuth } from './context/AuthContext';
 import { config } from './config';
-import { Ionicons } from '@expo/vector-icons';
 import { theme } from './theme';
 
 export default function ChooseEventScreen() {
@@ -74,15 +73,14 @@ export default function ChooseEventScreen() {
 
     return (
         <View style={styles.container}>
-            <ScrollView style={styles.multipleEventsContainer}>
+            <ScrollView
+                style={styles.multipleEventsContainer}
+                contentContainerStyle={styles.scrollContent}
+                keyboardShouldPersistTaps="handled"
+            >
                 {events.map((event) => (
                     <View key={event.id} style={styles.eventCard}>
-                        {event.eventThumbnail?.url && (
-                            <Image
-                                source={{ uri: `${config.apiBaseUrl}${event.eventThumbnail.url}` }}
-                                style={styles.thumbnail}
-                            />
-                        )}
+
                         <Text style={styles.eventTitle}>{event.title}</Text>
                         <Text style={styles.eventDate}>
                             {formatDateRange(event.startDatetime, event.endDatetime)}
@@ -136,13 +134,22 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: theme.spacing.md,
         backgroundColor: theme.colors.background,
+        paddingBottom: theme.spacing.xl,
     },
     multipleEventsContainer: {
-        flex: 1,
+        flex: 1
     },
+    scrollContent: {
+        paddingTop: 0, // if you want it *exactly* under the header
+        paddingBottom: theme.spacing.xl, // space for Confirm button
+        flexGrow: 1,
+        justifyContent: 'flex-start', // <-- ensures top alignment
+    },
+
     eventCard: {
         backgroundColor: '#fff',
         borderRadius: theme.radius.md,
+        paddingTop: 0,
         padding: theme.spacing.md,
         marginBottom: theme.spacing.md,
         shadowColor: '#000',
@@ -150,6 +157,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 2,
+        marginTop: 0,
     },
     thumbnail: {
         width: '100%',
