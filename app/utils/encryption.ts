@@ -6,10 +6,11 @@ const IV_LENGTH = 16; // AES block size
 const KEY_LENGTH = 16; // AES key length
 export function encrypt(text: string): string {
   const key = config.encryptionKey;
+
   // Generate a random IV
   const iv = CryptoJS.lib.WordArray.random(IV_LENGTH);
   // Encrypt
-  const encrypted = CryptoJS.AES.encrypt(text, CryptoJS.enc.Utf8.parse(key), {
+  const encrypted = CryptoJS.AES.encrypt(text, CryptoJS.enc.Utf8.parse(key.slice(0,KEY_LENGTH)), {
     iv: iv,
     mode: CryptoJS.mode.CTR,
     padding: CryptoJS.pad.NoPadding,
