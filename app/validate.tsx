@@ -63,8 +63,8 @@ export default function ValidateScreen() {
         const encodedTicket = encodeURIComponent(JSON.stringify({
           code: data.ticket.ticketCode,
           attendeeName: data.ticket.attendeeName,
-          eventName: data.ticket.eventTitle,
-          eventTime: data.ticket.scheduleDate.split(' ')[0],
+          eventName: eventTitle,
+          eventTime: scheduleDate,
           seat: data.ticket.seat,
         }));
         const encodedCheckinRecord = encodeURIComponent(JSON.stringify(data.checkinRecord));
