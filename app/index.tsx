@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import {
   View,
+  ScrollView,
+  KeyboardAvoidingView,
   Text,
   StyleSheet,
   TextInput,
@@ -33,7 +35,9 @@ export default function LoginScreen() {
     }
 
     try {
+
       const endpoint = `${config.apiBaseUrl}/checkin-app/auth`;
+
       const encryptedEmail = await encrypt(email);
       const encryptedPassword = await encrypt(password);
 
@@ -65,7 +69,7 @@ export default function LoginScreen() {
           role: data.user?.role
         };
         await login(data.token, userData);
-        router.replace('/validate');
+        router.replace('/events');
       } else {
         throw new Error('No token received');
       }
@@ -212,5 +216,10 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
   },
 });
