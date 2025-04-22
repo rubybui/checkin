@@ -1,11 +1,8 @@
-import { Platform } from 'react-native';
-
-const isDev = __DEV__;
 
 // Get the correct API URL based on platform and environment
 const getApiBaseUrl = () => {
 
-  return 'https://test.orchestars.vn/api'
+  return 'https://test.orchestars.vn/api' // Replace with your actual API URL
   // if (isDev) {
   //   // Development environment - use localhost for all platforms
   //   // This works because we're allowing all origins in dev mode
@@ -17,6 +14,5 @@ const getApiBaseUrl = () => {
 
 export const config = {
   apiBaseUrl: getApiBaseUrl(),
-  encryptionKey: 'YOUR_SECRET_HERE', // Replace with your actual encryption key - must match server
-  isDev, // Export isDev flag for use in other parts of the app
+
 }; 

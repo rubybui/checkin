@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import {
   View,
-  ScrollView,
-  KeyboardAvoidingView,
   Text,
   StyleSheet,
   TextInput,
@@ -15,7 +13,7 @@ import {
   ScrollView
 } from 'react-native';
 import { Stack } from 'expo-router';
-import { encrypt } from './utils/encryption';
+
 import { config } from './config';
 import { useAuth } from './context/AuthContext';
 import { useRouter } from 'expo-router';
@@ -38,12 +36,10 @@ export default function LoginScreen() {
 
       const endpoint = `${config.apiBaseUrl}/checkin-app/auth`;
 
-      const encryptedEmail = await encrypt(email);
-      const encryptedPassword = await encrypt(password);
-
+      // Encrypt credentials
       const requestBody = {
-        email: encryptedEmail,
-        password: encryptedPassword
+        email,
+        password,
       };
 
       const response = await fetch(endpoint, {
@@ -216,10 +212,5 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 24,
   },
 });
