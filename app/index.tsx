@@ -10,7 +10,9 @@ import {
   SafeAreaView,
   Alert,
   ActivityIndicator,
-  Platform
+  Platform,
+  KeyboardAvoidingView,
+  ScrollView
 } from 'react-native';
 import { Stack } from 'expo-router';
 import { encrypt } from './utils/encryption';
@@ -36,7 +38,6 @@ export default function LoginScreen() {
 
       const endpoint = `${config.apiBaseUrl}/checkin-app/auth`;
 
-      // Encrypt credentials
       const encryptedEmail = await encrypt(email);
       const encryptedPassword = await encrypt(password);
 
@@ -44,8 +45,6 @@ export default function LoginScreen() {
         email: encryptedEmail,
         password: encryptedPassword
       };
-
-      console.log('[ios] Request Body:', JSON.stringify(requestBody));
 
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -62,9 +61,7 @@ export default function LoginScreen() {
       }
 
       const data = await response.json();
-      console.log('[ios] Login response:', data);
 
-      // Handle successful login
       if (data.token) {
         const userData = {
           id: data.user?.id,
@@ -77,7 +74,6 @@ export default function LoginScreen() {
         throw new Error('No token received');
       }
     } catch (error) {
-      console.error('[ios] Login error caught:', error);
       Alert.alert(
         'Login Failed',
         error instanceof Error ? error.message : 'An error occurred during login'
@@ -87,15 +83,12 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Stack.Screen
-        options={{
-          headerShown: false,
-        }}
-      />
+      <Stack.Screen options={{ headerShown: false }} />
+
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={80}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -158,11 +151,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.primary,
   },
+  scrollContent: {
+    flexGrow: 1,
+  },
   content: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
+    paddingVertical: 48,
   },
   title: {
     fontSize: 32,
