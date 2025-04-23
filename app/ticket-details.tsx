@@ -11,6 +11,7 @@ const screenWidth = Dimensions.get('window').width;
 export default function TicketDetailsScreen() {
   const { ticket, checkinRecord } = useLocalSearchParams();
 
+
   const ticketData = ticket ? JSON.parse(decodeURIComponent(ticket as string)) : null;
   const checkinData = checkinRecord ? JSON.parse(decodeURIComponent(checkinRecord as string)) : null;
   const alreadyCheckedIn = !!checkinData;
@@ -107,7 +108,7 @@ export default function TicketDetailsScreen() {
         {alreadyCheckedIn && (
           <View style={styles.infoBox}>
             <Text style={styles.detailLabel}>Checked in at</Text>
-            <Text style={styles.detailValue}>{new Date(checkinData.checkedInAt).toLocaleString()}</Text>
+            <Text style={styles.detailValue}>{checkinData.checkInTime}</Text>
             <Text style={styles.detailLabel}>By</Text>
             <Text style={styles.detailValue}>{checkinData.checkedInBy?.email || 'N/A'}</Text>
           </View>
