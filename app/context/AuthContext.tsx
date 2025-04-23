@@ -37,7 +37,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useProtectedRoute(user);
 
   const login = (token: string, userData: any) => {
-    console.log(`[${Platform.OS}] Login called with:`, { token, userData });
     setUser({ token, userData });
   };
 
