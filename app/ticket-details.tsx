@@ -10,7 +10,7 @@ const screenWidth = Dimensions.get('window').width;
 
 export default function TicketDetailsScreen() {
   const { ticket, checkinRecord } = useLocalSearchParams();
-  
+
   const ticketData = ticket ? JSON.parse(decodeURIComponent(ticket as string)) : null;
   const checkinData = checkinRecord ? JSON.parse(decodeURIComponent(checkinRecord as string)) : null;
   const alreadyCheckedIn = !!checkinData;
@@ -26,6 +26,7 @@ export default function TicketDetailsScreen() {
           'Content-Type': 'application/json',
           Authorization: `JWT ${user?.token}`,
         },
+        body: JSON.stringify({ eventDate: ticketData.eventTime })
       });
 
       if (!response.ok) {
@@ -48,10 +49,50 @@ export default function TicketDetailsScreen() {
       </View>
     );
   }
+  const categories = [
+    {
+      id: 'zone1',
+      name: 'Zone 1',
+      color: '#B60208',
+      textColor: '#fff',
+    },
+    {
+      id: 'zone2',
+      name: 'Zone 2',
+      color: '#F99446',
+      textColor: '#fff',
+    },
+    {
+      id: 'zone3',
+      name: 'Zone 3',
+      color: '#d9cc09',
+      textColor: '#fff',
+    },
+    {
+      id: 'zone4',
+      name: 'Zone 4',
+      color: '#1EB0EF',
+      textColor: '#fff',
+    },
+    {
+      id: 'zone5',
+      name: 'Zone 5',
+      color: '#0FAD4F',
+      textColor: '#fff',
+    },
+  ]
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={[styles.card, alreadyCheckedIn ? styles.cardUsed : styles.cardValid]}>
+      <View
+        style={[
+          styles.card,
+          {
+            backgroundColor:
+              categories.find((c) => c.id === ticketData.ticketPriceInfo?.key)?.color,
+          },
+        ]}
+      >
         <Ionicons
           name={alreadyCheckedIn ? 'close-circle' : 'checkmark-circle'}
           size={80}
@@ -74,10 +115,12 @@ export default function TicketDetailsScreen() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>TICKET DETAILS</Text>
-
           <View style={styles.detailRow}><Text style={styles.detailLabel}>Name:</Text><Text style={styles.detailValue}>{ticketData.attendeeName}</Text></View>
           <View style={styles.detailRow}><Text style={styles.detailLabel}>Event:</Text><Text style={styles.detailValue}>{ticketData.eventName}</Text></View>
           <View style={styles.detailRow}><Text style={styles.detailLabel}>Date:</Text><Text style={styles.detailValue}>{ticketData.eventTime}</Text></View>
+          <View style={styles.detailRow}><Text style={styles.detailLabel}>Email:</Text><Text style={styles.detailValue}>{ticketData.email}</Text></View>
+          <View style={styles.detailRow}><Text style={styles.detailLabel}>Phone Number:</Text><Text style={styles.detailValue}>{ticketData.phoneNumber}</Text></View>
+          <View style={styles.detailRow}><Text style={styles.detailLabel}>Ticket Type:</Text><Text style={styles.detailValue}>{ticketData.ticketPriceInfo.name}</Text></View>
           <View style={styles.detailRow}><Text style={styles.detailLabel}>Seat:</Text><Text style={styles.detailValue}>{ticketData.seat}</Text></View>
 
         </View>
@@ -116,12 +159,6 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.lg,
     padding: theme.spacing.lg,
     alignItems: 'center',
-  },
-  cardValid: {
-    backgroundColor: theme.colors.success,
-  },
-  cardUsed: {
-    backgroundColor: theme.colors.error,
   },
   statusIcon: {
     marginBottom: theme.spacing.sm,
